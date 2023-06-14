@@ -1,0 +1,29 @@
+version: '02'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: my-mysql-container
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+    networks:
+      - my-network
+    volumes:
+      - .mysql:/var/lib/mysql
+
+  apache-php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: php:7.4-apache
+    container_name: my-apache-php-container
+    ports:
+      - 85:80
+    networks:
+      - my-network
+    depends_on:
+      - mysql
+    volumes:
+      - .apache-vol:/var/www/html
+
+networks:
+  my-network:
