@@ -1,0 +1,42 @@
+kind: Deployment
+metadata:
+  name: ng-deployment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ng
+  template:
+    metadata:
+      labels:
+        app: ng
+    spec:
+      containers:
+      - name: ng
+        image: trafex/php-nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: ng-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: ng-persistent-storage
+        persistentVolumeClaim:
+          claimName: apache-pv-claim
+
+---
+
+apiVersion: v2
+kind: Service
+metadata:
+  name: ng-service
+spec:
+  selector:
+    app: ng
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30085
+  type: NodePort
+

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-deployment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apache
+  template:
+    metadata:
+      labels:
+        app: apache
+    spec:
+      containers:
+      - name: apache
+        image: sip23bjit/kube01:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: apache-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: apache-persistent-storage
+        persistentVolumeClaim:
+          claimName: apache-pv-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-service
+spec:
+  selector:
+    app: apache
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30080
+  type: NodePort
+
